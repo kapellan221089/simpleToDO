@@ -1,23 +1,33 @@
 <template>
-  <v-app>
-    <v-main>
-      <SimpleToDo/>
-    </v-main>
-  </v-app>
+  <div id="app">
+    <div id="nav">
+      <router-link to="/">Главная</router-link>
+    </div>
+    <v-app>
+      <router-view/>
+    </v-app>
+  </div>
 </template>
 
-<script>
-import SimpleToDo from './components/SimpleToDo';
+<style lang="scss">
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
 
-export default {
-  name: 'App',
+#nav {
+  padding: 30px;
 
-  components: {
-    SimpleToDo,
-  },
+  a {
+    font-weight: bold;
+    color: #2c3e50;
 
-  data: () => ({
-    //
-  }),
-};
-</script>
+    &.router-link-exact-active {
+      color: #42b983;
+    }
+  }
+}
+</style>

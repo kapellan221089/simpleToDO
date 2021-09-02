@@ -1,90 +1,85 @@
 <template>
   <v-container>
-    <v-simple-table>
-    <template v-slot:default>
-      <thead >
-        <tr>
-          <th class="text-left">
-            Название
-          </th>
-          <th class="text-left">
-            Описание
-          </th>
-          <th class="text-left">
-            Статус
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="item in todo"
-          :key="item.name"
-        > 
-          <td class="text-left">{{item.name}}</td>
-          <td class="text-left">{{ item.descriptions }}</td>
-          <td class="text-left">{{ item.status }}
-            <v-btn
-              class="mx-2 float-right"
-              fab
-              dark
-              small
-              color="cyan"
-              @click="dialog = !dialog"
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-            <v-dialog
-              v-model="dialog"
-              max-width="500px"
-              >
-                <v-card
-                  v-show="dialog"
+    <v-data-iterator
+      :items="statuses"
+      hide-default-footer
+    >
+      <template v-slot:default="">
+        <v-row>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-card>
+              <v-card-title class="subheading font-weight-bold">
+                К выполнению
+              </v-card-title>
+
+              <v-divider></v-divider>
+
+              <v-list dense>
+                <v-list-item
+                  v-for="start in startArr"
+                  v-model="start.name"
+                  :key="start.name"
+                  class="item"
                 >
-                  <v-form
-                  >
-                  <v-text-field
-                    v-model="changeDO.name"
-                    label="Название"
-                    required
-                  ></v-text-field>
+                  <v-list-item-content class="align-end" @click="sayHi1(start)">
+                    {{start.name}}
+                  </v-list-item-content>
+                </v-list-item>
 
-                  <v-text-field
-                  v-model="changeDO.descriptions"
-                    label="Описание"
-                    required
-                  ></v-text-field>
+              </v-list>
+            </v-card>
+          </v-col>
+            <v-col>
+              <v-card>
+                <v-card-title class="subheading font-weight-bold">
+                  В работе
+                </v-card-title>
 
-                  <v-select
-                  v-model="changeDO.status"
-                    :items="statuses"
-                    :rules="[v => !!v || 'Item is required']"
-                    label="Статус"
-                    required
-                  ></v-select>
-                  <v-btn
-                    color="success"
-                    class="mr-4"
-                    @click="sayHi1(item)"
-                  >
-                    Создать
-                  </v-btn>
+                <v-divider></v-divider>
 
-                  <v-btn
-                    color="error"
-                    class="mr-4"
-                    @click="reset"
+                <v-list dense>
+                  <v-list-item
+                    v-for="work in workArr"
+                    v-model="work.name"
+                    :key="work.name"
+                    class="item"
                   >
-                    Сбросить
-                  </v-btn>
-                  </v-form>
-                </v-card>
-            </v-dialog>
-          </td>
-        </tr>
-      </tbody>
-    </template>
-    </v-simple-table>
-    <v-row >
+                    <v-list-item-content class="align-end" @click="sayHi1(work)">
+                      {{work.name}}
+                    </v-list-item-content>
+                  </v-list-item>
+
+                </v-list>
+              </v-card>
+          </v-col>
+          <v-col>
+            <v-card>
+              <v-card-title class="subheading font-weight-bold">
+                Готово
+              </v-card-title>
+
+              <v-divider></v-divider>
+
+              <v-list dense>
+                <v-list-item
+                  v-for="done in doneArr"
+                  :key="done.name"
+                  class="item"
+                >
+                  <v-list-item-content class="align-end" @click="sayHi1(done)">
+                    {{done.name}}
+                  </v-list-item-content>
+                </v-list-item>
+
+              </v-list>
+            </v-card>
+          </v-col>
+        </v-row>
+      </template>
+    </v-data-iterator>
+    <v-row justify="center">
     <v-col class="shrink">
       <v-btn
         class="ma-2"
@@ -92,56 +87,7 @@
         @click="sayHi"
       >
         Создать задачу
-        <template v-slot:loader>
-          <span>Loading...</span>
-        </template>
       </v-btn>
-      <v-expand-transition>
-        <v-card
-          v-show="expand"
-          height="300"
-          width="300"
-        >
-          <v-form
-          ref="form"
-          >
-          <v-text-field
-            v-model="todos.name"
-            label="Название"
-            required
-          ></v-text-field>
-
-          <v-text-field
-            v-model="todos.descriptions"
-            label="Описание"
-            required
-          ></v-text-field>
-
-          <v-select
-            v-model="todos.status"
-            :items="statuses"
-            :rules="[v => !!v || 'Item is required']"
-            label="Статус"
-            required
-          ></v-select>
-          <v-btn
-            color="success"
-            class="mr-4"
-            @click="create"
-          >
-            Создать
-          </v-btn>
-
-          <v-btn
-            color="error"
-            class="mr-4"
-            @click="reset"
-          >
-            Сбросить
-          </v-btn>
-          </v-form>
-        </v-card>
-      </v-expand-transition>
     </v-col>
     </v-row>
   </v-container>
@@ -150,51 +96,53 @@
 <script>
   export default {
     name: 'simpleToDo',
-
     data: () => ({
-        todo: [
-        ],
-        todos: {
-          name: '',
-          descriptions: '',
-          status: ''
-        },
-        statuses: [
-          'К выполнению',
-          'В работе',
-          'Готово',
-          'Что нам делать памагити))',
-        ],
-        expand: false,
-        expand2: false,
-        dialog: false,
-        changeDO: {
-          name: '',
-          descriptions: '',
-          status: ''
-        }
+      statuses: [
+        'К выполнению',
+        'В работе',
+        'Готово'
+      ],
+      doneArr:[],
+      workArr:[],
+      startArr:[]
     }),
+    mounted() {
+      for (let i=0; i<this.$store.state.todos.length; i++) {
+        do{
+          if(this.$store.state.todos[i].status === 'Готово') {
+            this.doneArr.push(this.$store.state.todos[i])
+            break;
+          }
+          if(this.$store.state.todos[i].status === 'В работе' ) {
+            this.workArr.push(this.$store.state.todos[i])
+            break;
+          }
+          if(this.$store.state.todos[i].status === 'К выполнению' ) {
+            this.startArr.push(this.$store.state.todos[i])
+            break;
+          }
+          // eslint-disable-next-line no-constant-condition
+        }while (true)
+      }
+    },
     methods: {
       sayHi () {
-        this.expand = !this.expand
+        this.$router.push('create')
+        //this.expand = !this.expand
       },
       sayHi1 (value) {
-        value.name = this.changeDO.name
-        value.descriptions = this.changeDO.descriptions
-        value.status = this.changeDO.status
-        this.changeDO.name = ''
-        this.changeDO.descriptions = ''
-        this.changeDO.status = ''
-        this.dialog = !this.dialog
-      },
-      create () {
-        this.todo.push({name: this.todos.name, descriptions: this.todos.descriptions, status: this.todos.status,})
-        this.expand = !this.expand
-        this.reset()
-      },
-      reset () {
-        this.$refs.form.reset()
-      },
+        console.log(value)
+        this.$store.commit('setCurrDo', value)
+        this.$router.push('about')
+      }
     }
   }
 </script>
+<style scoped>
+  .item :hover{
+    cursor: pointer;
+    border-radius: 3px;
+    background-color: #4caf50;
+  }
+
+</style>
